@@ -1,3 +1,5 @@
+# -*- coding:utf8 -*-
+
 import pymysql
 from config import dbconfig
 from .function import debug
@@ -190,16 +192,19 @@ class DBConfig(object):
         for k, v in data.items():
             if i != length:
                 columns = columns + k + ","
-                if table_columns_dict[k] in str_dict:
-                    value = value + "'" + str(v) + "',"
-                else:
-                    value = value + str(v) + ","
+                # if table_columns_dict[k] in str_dict:
+                tmpstr = "%s," % self.db.escape(v)
+                value = value + tmpstr
+                # else:
+                # tmpstr = "%s," % self.db.escape()
+                # value = value + tmpstr
             else:
                 columns = columns + k
-                if table_columns_dict[k] in str_dict:
-                    value = value + "'" + str(v) + "'"
-                else:
-                    value = value + str(v)
+                # if table_columns_dict[k] in str_dict:
+                tmpstr = "%s" % self.db.escape(v)
+                value = value + tmpstr
+                # else:
+                #     value = value + str(v)
             if k in table_columns_dict:
                 del table_columns_dict[k]
             i = i + 1
