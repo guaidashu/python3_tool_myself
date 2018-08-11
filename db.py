@@ -97,7 +97,7 @@ class DBConfig(object):
                 results = self.cursor.fetchone()
         except:
             results = 0
-            debug("获取出错")
+            debug("It's error that get table columns")
         return results
 
     def insert(self, sql):
@@ -107,7 +107,7 @@ class DBConfig(object):
             self.db.commit()
             results = 1
         except:
-            debug("数据库插入出错")
+            debug("Database insert error")
             results = 0
         self.closeDB()
         return results
@@ -119,7 +119,7 @@ class DBConfig(object):
             self.db.commit()
             results = 1
         except:
-            debug("数据库更新出错")
+            debug("Database update error")
             results = 0
         self.closeDB()
         return results
