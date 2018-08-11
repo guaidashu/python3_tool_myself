@@ -10,12 +10,12 @@ class DBConfig(object):
     password = config['password']
     host = config['host']
     port = config['port']
-    database = config['database']
+    # database = config['database']
     # username = "yy"
     # password = "wyysdsa!"
     # host = "127.0.0.1"
     # port = "3306"
-    # database = "hedui"
+    database = "hedui"
     db = None
     cursor = None
 
@@ -42,7 +42,7 @@ class DBConfig(object):
                     columns_sql = {
                         "table": "information_schema.columns",
                         "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                        "condition": ['TABLE_NAME = "' + data['table'] + '"']
+                        "condition": ['TABLE_NAME = "' + data['table'] + '"', "and", 'TABLE_SCHEMA = "' + self.database + '"']
                     }
                     columns_data = self.getColumns(columns_sql)
                 except:
@@ -57,7 +57,7 @@ class DBConfig(object):
                 columns_sql = {
                     "table": "information_schema.columns",
                     "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                    "condition": ['TABLE_NAME = "' + data['table'] + '"']
+                    "condition": ['TABLE_NAME = "' + data['table'] + '"', "and", 'TABLE_SCHEMA = "' + self.database + '"']
                 }
                 columns_data = self.getColumns(columns_sql)
             except:
@@ -97,6 +97,7 @@ class DBConfig(object):
                 results = self.cursor.fetchone()
         except:
             results = 0
+            debug("获取出错")
         return results
 
     def insert(self, sql):
@@ -170,7 +171,7 @@ class DBConfig(object):
         table_sql = {
             "table": "information_schema.columns",
             "columns": ["COLUMN_NAME", "DATA_TYPE"],
-            "condition": ['TABLE_NAME = "' + table + '"']
+            "condition": ['TABLE_NAME = "' + table + '"', "and", 'TABLE_SCHEMA = "' + self.database + '"']
         }
         table_columns = self.getColumns(table_sql)
         table_sql['condition'].append("and EXTRA like '%auto_increment%'")

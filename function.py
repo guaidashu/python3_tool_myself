@@ -1,9 +1,11 @@
 import json
 import hashlib
 import requests
+import random
 
 
 # change the dict to a json str
+# noinspection PyShadowingBuiltins
 def js_arr(text=None, id=None, reply=None):
     """
     This function is a tool which change the dict to a json str
@@ -94,14 +96,26 @@ def changeToStr(data, rowstr="<br>", count=4, origin_count=4):
 
 
 def formatData(data):
+    """
+    :param data:
+    :return: str : this str can print to web page.
+    """
     return "<pre>" + changeToStr(data, rowstr="<br/>") + "</pre>"
 
 
 def debug(data):
+    """
+    :param data:
+    :return: no return
+    """
     print(changeToStr(data, rowstr="\n"))
 
 
 def replace_html(s):
+    """
+    :param s: str
+    :return: str
+    """
     s = s.replace('&quot;', '"')
     s = s.replace('&amp;', '&')
     s = s.replace('&lt;', '<')
@@ -195,3 +209,23 @@ def byteToStr(data, dataType=None):
         return dict(map(byteToStr, data.items()))
     else:
         return data
+
+
+def virtualIp():
+    """
+    This function can get a virtual ip. We can use it to make a virtual X-FORWARDED-FOR or CLIENT-IP.
+    :return: str : a virtual ip.
+    """
+    ip_list = [
+        "218", "218", "66", "66", "218", "218", "60", "60", "202", "204", "66", "66", "66", "59", "61", "60", "222",
+        "221",
+        "66", "59", "60", "60", "66", "218", "218", "62", "63", "64", "66", "66", "122", "211"]
+    randindex = random.randint(0, len(ip_list))
+    if randindex > 30:
+        randindex = randindex - 1
+    ip_1 = ip_list[randindex]
+    ip_2 = round(random.randint(600000, 2550000) / 10000)
+    ip_3 = round(random.randint(600000, 2550000) / 10000)
+    ip_4 = round(random.randint(600000, 2550000) / 10000)
+    ip = str(ip_1) + "." + str(ip_2) + "." + str(ip_3) + "." + str(ip_4)
+    return ip
