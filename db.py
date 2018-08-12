@@ -12,12 +12,12 @@ class DBConfig(object):
     password = config['password']
     host = config['host']
     port = config['port']
-    # database = config['database']
+    database = config['database']
     # username = "yy"
     # password = "wyysdsa!"
     # host = "127.0.0.1"
     # port = "3306"
-    database = "hedui"
+    # database = "hedui"
     db = None
     cursor = None
 
@@ -193,7 +193,7 @@ class DBConfig(object):
             if i != length:
                 columns = columns + k + ","
                 # if table_columns_dict[k] in str_dict:
-                tmpstr = "%s," % self.db.escape(v)
+                tmpstr = "%s," % self.db.escape(str(v))
                 value = value + tmpstr
                 # else:
                 # tmpstr = "%s," % self.db.escape()
@@ -201,7 +201,7 @@ class DBConfig(object):
             else:
                 columns = columns + k
                 # if table_columns_dict[k] in str_dict:
-                tmpstr = "%s" % self.db.escape(v)
+                tmpstr = "%s" % self.db.escape(str(v))
                 value = value + tmpstr
                 # else:
                 #     value = value + str(v)
