@@ -136,10 +136,13 @@ def curlData(url, value=False, referer=False):
     :return: str(web page's source data)
     """
     headers = dict()
+    ip = virtualIp()
     headers['User-Agent'] = "baiduspider"
     headers['Cookie'] = ""
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
+    headers['CLIENT-IP'] = ip
+    headers['X-FORWARDED-FOR'] = ip
     if referer:
         headers['Referer'] = referer
     if value:
