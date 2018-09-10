@@ -1,16 +1,27 @@
 # -*- coding:utf8 -*-
 
 from phoenixdb import connect
-from .function import debug
+from tool.function import debug
 import pymysql
-from .config import phoenix_db_config as dbconfig
+from tool.config import phoenix_db_config as dbconfig
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic,PyBroadException,PyStatementEffect
 class DBConfig(object):
+    """
+    PS: If you want to use this tool to insert data,
+        you should start your localhost mysql,
+        because I can't filter some str,
+        so I use pymysql's method which called 'escape'.
+        And if you want to use it,
+        now, you only can start your localhost mysql.
+        If someone can solve it, welcome to leave a message for me.
+        Thanks.
+    """
     config = dbconfig.dbconfig()
     host = config['host']
     table_prefix = config['table_prefix']
+    is_connection = False
     try:
         is_debug = config['debug']
     except:
@@ -26,17 +37,19 @@ class DBConfig(object):
 
     def getCursor(self):
         try:
-            self.db = self.getConnect()
+            if not self.is_connection:
+                self.db = self.getConnect()
+                self.is_connection = True
         except Exception as e:
             if self.is_debug:
                 debug("数据库连接失败：")
                 debug(e)
-        finally:
-            return self.db.cursor()
+        return self.db.cursor()
 
     def closeDB(self):
         try:
             self.db.close()
+            self.is_connection = False
         except Exception as e:
             if self.is_debug:
                 debug("数据库关闭失败：")
@@ -277,11 +290,17 @@ class DBConfig(object):
         for k, v in data.items():
             if i != length:
                 columns = columns + '"' + k + "\","
-                tmpstr = "%s," % filter_db.escape(v)
+                if k.lower() == "id":
+                    tmpstr = "%s," % v
+                else:
+                    tmpstr = "%s," % filter_db.escape(v)
                 value = value + tmpstr
             else:
                 columns = columns + '"' + k + '"'
-                tmpstr = "%s" % filter_db.escape(v)
+                if k.lower() == "id":
+                    tmpstr = "%s" % v
+                else:
+                    tmpstr = "%s" % filter_db.escape(v)
                 value = value + tmpstr
             if k in table_columns_dict:
                 del table_columns_dict[k]
@@ -314,21 +333,20 @@ class DBConfig(object):
             self.closeDB()
         return 0
 
-    def free(self, sql):
+    def free(self, sql, is_close_db=True):
         self.cursor = self.getCursor()
         data = 0
         try:
             self.cursor.execute(sql)
-            if sql.find("select ") != -1:
+            if sql.lower().find("select ") != -1:
                 data = self.cursor.fetchall()
-            if self.is_debug:
-                debug("原生语句执行成功")
         except Exception as e:
             if self.is_debug:
                 debug("原生语句执行出错，报错信息：")
                 debug(e)
         finally:
-            self.closeDB()
+            if is_close_db:
+                self.closeDB()
         return data
 
 
