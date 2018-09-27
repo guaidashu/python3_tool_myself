@@ -68,6 +68,7 @@ class DBConfig(object):
                     columns_data = self.getColumns(columns_sql)
                 except:
                     self.closeDB()
+                    columns_data = list()
                     if self.is_debug:
                         return {"error": "字段信息获取失败"}
             else:
@@ -94,7 +95,8 @@ class DBConfig(object):
         except:
             self.closeDB()
             if self.is_debug:
-                results = {"error": "数据获取失败"}
+                results = list()
+                return {"error": "数据获取失败"}
         if is_close_db:
             self.closeDB()
         if get_all:
@@ -165,6 +167,8 @@ class DBConfig(object):
 
     def update(self, sql, is_close_db=True):
         self.cursor = self.getCursor()
+        sql = self.getUpdateSql(sql)
+        debug(sql)
         try:
             self.cursor.execute(sql)
             self.db.commit()
@@ -201,7 +205,7 @@ class DBConfig(object):
         sql = sql + s + ' from "' + self.table_prefix + data['table'] + '"'
         # if there is a condition , we spell it
         try:
-            data['condition']
+            unusedata = data['condition']
             sql = sql + " where "
             s = ""
             for i in data['condition']:
@@ -258,7 +262,32 @@ class DBConfig(object):
         # if there is limit. we spell it
         try:
             data['limit']
-            sql = sql + " limit " + str(data['limit'][0]) + "," + str(data['limit'][1])
+            sql = sql + " limit " + str(data['limit'][1]) + " offset " + str(data['limit'][0])
+        except:
+            pass
+        if is_close_db:
+            self.closeDB()
+        return sql
+
+    def getUpdateSql(self, data, is_close_db=False):
+        sql = "update "
+        sql = sql + '"' + self.table_prefix + data['table'] + '" set '
+        try:
+            data['set']
+            s = ""
+            for i in data['set']:
+                s = s + i + " "
+            sql = sql + s
+        except:
+            pass
+        # if there is a condition , we spell it
+        try:
+            data['condition']
+            sql = sql + "where "
+            s = ""
+            for i in data['condition']:
+                s = s + i + " "
+            sql = sql + s
         except:
             pass
         if is_close_db:
@@ -278,7 +307,7 @@ class DBConfig(object):
         table_columns_dict = dict()
         str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext", "datetime": "datetime",
                     "char": "char"}
-        # int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float"}
+        int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float", "integer": "integer"}
         try:
             for v in table_columns:
                 table_columns_dict[v[0]] = v[1].lower()
@@ -289,16 +318,21 @@ class DBConfig(object):
         filter_db = pymysql.connect()
         for k, v in data.items():
             if i != length:
-                columns = columns + '"' + k + "\","
-                if k.lower() == "id":
-                    tmpstr = "%s," % v
+                columns = columns + '"' + k + '",'
+                # if k.lower() == "id":
+                if table_columns_dict[k.lower()] in int_dict:
+                    if v == "":
+                        v = 0
+                    tmpstr = "%s," % str(v)
                 else:
                     tmpstr = "%s," % filter_db.escape(v)
                 value = value + tmpstr
             else:
                 columns = columns + '"' + k + '"'
-                if k.lower() == "id":
-                    tmpstr = "%s" % v
+                if table_columns_dict[k.lower()] in int_dict:
+                    if v == "":
+                        v = 0
+                    tmpstr = "%s" % str(v)
                 else:
                     tmpstr = "%s" % filter_db.escape(v)
                 value = value + tmpstr
@@ -335,7 +369,7 @@ class DBConfig(object):
 
     def free(self, sql, is_close_db=True):
         self.cursor = self.getCursor()
-        data = 0
+        data = 1
         try:
             self.cursor.execute(sql)
             if sql.lower().find("select ") != -1:
@@ -343,6 +377,7 @@ class DBConfig(object):
         except Exception as e:
             if self.is_debug:
                 debug("原生语句执行出错，报错信息：")
+                data = 0
                 debug(e)
         finally:
             if is_close_db:

@@ -2,6 +2,7 @@ import json
 import hashlib
 import requests
 import random
+import time
 
 
 # change the dict to a json str
@@ -29,6 +30,21 @@ def md5(s1):
     """
     s = str(s1)
     h1 = hashlib.md5()
+    h1.update(s.encode(encoding='utf-8'))
+    s = h1.hexdigest()
+    return s
+
+
+# get a sha1 str
+def sha1(s1):
+    """
+        This function can turn a str into a str which has been encrypted by md5
+
+        :param s1: It's a str.
+        :return: str
+        """
+    s = str(s1)
+    h1 = hashlib.sha1()
     h1.update(s.encode(encoding='utf-8'))
     s = h1.hexdigest()
     return s
@@ -103,7 +119,7 @@ def formatData(data):
     return "<pre>" + changeToStr(data, rowstr="<br/>") + "</pre>"
 
 
-def debug(data):
+def debug(data=""):
     """
     :param data:
     :return: no return
@@ -126,29 +142,42 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curlData(url, value=False, referer=False):
+def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip=""):
     """
     This function can get a web page's source data.
 
+    :param proxy_ip:
+    :param header:
     :param url: str
     :param value: dict or default(None)
     :param referer: str
+    :param cookie: str
     :return: str(web page's source data)
     """
     headers = dict()
     ip = virtualIp()
     headers['User-Agent'] = "baiduspider"
-    headers['Cookie'] = ""
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
-    headers['CLIENT-IP'] = ip
-    headers['X-FORWARDED-FOR'] = ip
-    if referer:
+    # headers['CLIENT-IP'] = ip
+    # headers['X-FORWARDED-FOR'] = ip
+    if isinstance(cookie, str):
+        headers['Cookie'] = cookie
+    if isinstance(referer, str):
         headers['Referer'] = referer
-    if value:
-        res = requests.post(url, data=value, headers=headers)
+    headers = headers.copy()
+    headers.update(header)
+    if proxy_ip != "":
+        proxy_ip_dict = {
+            "http": proxy_ip,
+            "https": proxy_ip
+        }
     else:
-        res = requests.get(url, headers=headers)
+        proxy_ip_dict = dict()
+    if isinstance(value, dict):
+        res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict)
+    else:
+        res = requests.get(url, headers=headers, proxies=proxy_ip_dict)
     try:
         data = res.content.decode("utf-8")
     except:
@@ -232,3 +261,8 @@ def virtualIp():
     ip_4 = round(random.randint(600000, 2550000) / 10000)
     ip = str(ip_1) + "." + str(ip_2) + "." + str(ip_3) + "." + str(ip_4)
     return ip
+
+
+def getTimeStamp(date, date_format):
+    time_arr = time.strptime(date, date_format)
+    return int(time.mktime(time_arr))

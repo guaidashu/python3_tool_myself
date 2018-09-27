@@ -1,6 +1,6 @@
 def dbconfig():
     config = {
-        "host": "",
+        "host": "47.106.218.50:8765",
         "table_prefix": "law_",
         "debug": True
     }
