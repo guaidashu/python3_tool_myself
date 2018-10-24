@@ -1,3 +1,4 @@
+import datetime
 import json
 import hashlib
 import requests
@@ -119,12 +120,17 @@ def formatData(data):
     return "<pre>" + changeToStr(data, rowstr="<br/>") + "</pre>"
 
 
-def debug(data=""):
+def debug(data="", is_set_time=False):
     """
+    :param is_set_time:
     :param data:
     :return: no return
     """
-    print(changeToStr(data, rowstr="\n"))
+    if is_set_time:
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("[" + now_time + "]  " + changeToStr(data, rowstr="\n"))
+    else:
+        print(changeToStr(data, rowstr="\n"))
 
 
 def replace_html(s):
@@ -142,10 +148,11 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip=""):
+def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50):
     """
     This function can get a web page's source data.
 
+    :param timeout:
     :param proxy_ip:
     :param header:
     :param url: str
@@ -175,9 +182,16 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
     else:
         proxy_ip_dict = dict()
     if isinstance(value, dict):
-        res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict)
+        if isinstance(cookie, dict):
+            res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
+                                timeout=timeout)
+        else:
+            res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     else:
-        res = requests.get(url, headers=headers, proxies=proxy_ip_dict)
+        if isinstance(cookie, dict):
+            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, cookies=cookie, timeout=timeout)
+        else:
+            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     try:
         data = res.content.decode("utf-8")
     except:
@@ -186,6 +200,53 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
         except:
             data = res.content
     return data
+
+
+# noinspection PyBroadException
+def getCookie(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50):
+    """
+        This function can get a web page's source data.
+
+        :param proxy_ip:
+        :param header:
+        :param url: str
+        :param value: dict or default(None)
+        :param referer: str
+        :param cookie: str
+        :return: str(web page's source data)
+        """
+    headers = dict()
+    ip = virtualIp()
+    headers['User-Agent'] = "baiduspider"
+    headers['Accept'] = "*/*"
+    headers['Connection'] = "keep-alive"
+    # headers['CLIENT-IP'] = ip
+    # headers['X-FORWARDED-FOR'] = ip
+    if isinstance(cookie, str):
+        headers['Cookie'] = cookie
+    if isinstance(referer, str):
+        headers['Referer'] = referer
+    headers = headers.copy()
+    headers.update(header)
+    if proxy_ip != "":
+        proxy_ip_dict = {
+            "http": proxy_ip,
+            "https": proxy_ip
+        }
+    else:
+        proxy_ip_dict = dict()
+    s = requests.session()
+    if isinstance(value, dict):
+        res = s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+    else:
+        res = s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+    try:
+        c = s.cookies.RequestsCookieJar()
+        c.set('cookie-name', 'cookie-value')
+        s.cookies.update(c)
+    except:
+        data = ""
+    return s.cookies.get_dict()
 
 
 # noinspection PyBroadException
@@ -264,5 +325,26 @@ def virtualIp():
 
 
 def getTimeStamp(date, date_format):
+    """
+    get a timestamp which type is int
+    :param date:
+    :param date_format:
+    :return:
+    """
     time_arr = time.strptime(date, date_format)
     return int(time.mktime(time_arr))
+
+
+def getNowTimeStamp():
+    return int(time.time())
+
+
+def getDateTime(time_stamp, date_format):
+    """
+    get a date which type is str
+    :param time_stamp:
+    :param date_format:
+    :return:
+    """
+    time_arr = time.localtime(time_stamp)
+    return time.strftime(date_format, time_arr)

@@ -4,6 +4,7 @@ from phoenixdb import connect
 from tool.function import debug
 import pymysql
 from tool.config import phoenix_db_config as dbconfig
+from tool.config import dbconfig as pymysql_config_origin
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic,PyBroadException,PyStatementEffect
@@ -19,6 +20,7 @@ class DBConfig(object):
         Thanks.
     """
     config = dbconfig.dbconfig()
+    pymysql_config = pymysql_config_origin.dbconfig()
     host = config['host']
     table_prefix = config['table_prefix']
     is_connection = False
@@ -116,6 +118,7 @@ class DBConfig(object):
 
     def getColumns(self, data, num=1, is_close_db=False):
         self.cursor = self.getCursor()
+        data['limit'] = [0, 1]
         sql = self.getSelectSql(data)
         try:
             self.cursor.execute(sql)
@@ -132,11 +135,11 @@ class DBConfig(object):
             self.closeDB()
         return results
 
-    def insert(self, sql, is_close_db=True):
+    def insert(self, sql, is_close_db=True, table_columns=False):
         self.cursor = self.getCursor()
         table = sql['table']
         del sql['table']
-        sql = self.getInsertSql(sql, table)
+        sql = self.getInsertSql(sql, table, self_colums=table_columns)
         try:
             self.cursor.execute(sql)
             self.db.commit()
@@ -294,7 +297,7 @@ class DBConfig(object):
             self.closeDB()
         return sql
 
-    def getInsertSql(self, data, table, is_close_db=False):
+    def getInsertSql(self, data, table, is_close_db=False, self_colums=False):
         # 构造插入查询语句，此函数传入参数data必须为dict()类型
         s = "upsert into \"" + self.table_prefix + table + "\"("
         columns = ""
@@ -303,11 +306,15 @@ class DBConfig(object):
         table_sql = {
             "table": table
         }
-        table_columns = self.getColumns(table_sql)
+        if not self_colums:
+            table_columns = self.getColumns(table_sql)
+        else:
+            table_columns = self_colums
         table_columns_dict = dict()
         str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext", "datetime": "datetime",
                     "char": "char"}
-        int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float", "integer": "integer"}
+        int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float",
+                    "integer": "integer"}
         try:
             for v in table_columns:
                 table_columns_dict[v[0]] = v[1].lower()
@@ -315,7 +322,8 @@ class DBConfig(object):
             pass
         length = len(data)
         i = 1
-        filter_db = pymysql.connect()
+        filter_db = pymysql.connect(self.pymysql_config['host'], self.pymysql_config['username'],
+                                    self.pymysql_config['password'], self.pymysql_config['database'], charset="utf8")
         for k, v in data.items():
             if i != length:
                 columns = columns + '"' + k + '",'

@@ -14,6 +14,8 @@ class DBConfig(object):
     port = config['port']
     database = config['database']
     table_prefix = config['table_prefix']
+    is_connection = False
+    is_debug = True
     # username = "yy"
     # password = "wyysdsa!"
     # host = "127.0.0.1"
@@ -25,18 +27,33 @@ class DBConfig(object):
     def __init__(self):
         pass
 
+    def __del__(self):
+        self.closeDB()
+
     def getConnect(self):
         return pymysql.connect(self.host, self.username, self.password, self.database, charset="utf8")
 
     def getCursor(self):
-        self.db = self.getConnect()
+        try:
+            if not self.is_connection:
+                self.db = self.getConnect()
+                self.is_connection = True
+        except Exception as e:
+            if self.is_debug:
+                debug("数据库连接失败：")
+                debug(e)
         return self.db.cursor()
 
     def closeDB(self):
-        self.db.close()
+        try:
+            self.db.close()
+        except:
+            pass
+            # debug("数据库关闭失败")
 
     def select(self, data, get_all=True, is_close_db=True):
         self.cursor = self.getCursor()
+        data['table'] = self.table_prefix + data['table']
         sql = self.getSelectSql(data)
         try:
             data['columns'][0]
@@ -45,7 +62,7 @@ class DBConfig(object):
                     columns_sql = {
                         "table": "information_schema.columns",
                         "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                        "condition": ['TABLE_NAME = "' + self.table_prefix + data['table'] + '"', "and",
+                        "condition": ['TABLE_NAME = "' + data['table'] + '"', "and",
                                       'TABLE_SCHEMA = "' + self.database + '"']
                     }
                     columns_data = self.getColumns(columns_sql)
@@ -61,7 +78,7 @@ class DBConfig(object):
                 columns_sql = {
                     "table": "information_schema.columns",
                     "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                    "condition": ['TABLE_NAME = "' + self.table_prefix + data['table'] + '"', "and",
+                    "condition": ['TABLE_NAME = "' + data['table'] + '"', "and",
                                   'TABLE_SCHEMA = "' + self.database + '"']
                 }
                 columns_data = self.getColumns(columns_sql)
@@ -136,6 +153,7 @@ class DBConfig(object):
 
     def update(self, sql, is_close_db=True):
         self.cursor = self.getCursor()
+        sql = self.getUpdateSql(sql)
         try:
             self.cursor.execute(sql)
             self.db.commit()
@@ -181,6 +199,46 @@ class DBConfig(object):
         try:
             data['limit']
             sql = sql + " limit " + str(data['limit'][0]) + "," + str(data['limit'][1])
+        except:
+            pass
+        if is_close_db:
+            self.closeDB()
+        return sql
+
+    def filterStr(self, s):
+        if not self.is_connection:
+            self.cursor = self.getCursor()
+        return self.db.escape(s)
+
+    def getUpdateSql(self, data, is_close_db=False):
+        """
+        :param data:  data['set'] is a dict  data['condition'] is a list
+        :param is_close_db:
+        :return:
+        """
+        sql = "update "
+        sql = sql + self.table_prefix + data['table'] + ' set '
+        try:
+            data['set']
+            s = ""
+            m = 0
+            for k, i in data['set'].items():
+                if m == 0:
+                    s = s + k + "=" + self.db.escape(i)
+                    m = m + 1
+                else:
+                    s = s + "," + k + "=" + self.db.escape(i)
+            sql = sql + s
+        except Exception as e:
+            pass
+        # if there is a condition , we spell it
+        try:
+            data['condition']
+            sql = sql + " where "
+            s = ""
+            for i in data['condition']:
+                s = s + i + " "
+            sql = sql + s
         except:
             pass
         if is_close_db:
