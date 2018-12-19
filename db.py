@@ -131,7 +131,8 @@ class DBConfig(object):
             self.cursor.execute(sql)
             self.db.commit()
             results = 1
-        except:
+        except Exception as e:
+            debug(e)
             debug("Database insert error")
             results = 0
         if is_close_db:
@@ -144,7 +145,8 @@ class DBConfig(object):
             self.cursor.execute(sql)
             self.db.commit()
             results = self.cursor.lastrowid
-        except:
+        except Exception as e:
+            debug(e)
             debug("Database insert error")
             results = 0
         if is_close_db:

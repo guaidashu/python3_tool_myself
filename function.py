@@ -148,7 +148,7 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50):
+def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50, open_virtual_ip=False):
     """
     This function can get a web page's source data.
 
@@ -166,8 +166,9 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
-    # headers['CLIENT-IP'] = ip
-    # headers['X-FORWARDED-FOR'] = ip
+    if open_virtual_ip:
+        headers['CLIENT-IP'] = ip
+        headers['X-FORWARDED-FOR'] = ip
     if isinstance(cookie, str):
         headers['Cookie'] = cookie
     if isinstance(referer, str):

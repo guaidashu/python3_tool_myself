@@ -240,9 +240,9 @@ class DBConfig(object):
         try:
             for i in data['columns']:
                 if i != data['columns'][-1]:
-                    s = s + i + ","
+                    s = s + "\"" + i + "\"" + ","
                 else:
-                    s = s + i
+                    s = s + "\"" + i + "\""
         except:
             s = "*"
         sql = sql + s + ' from "' + self.table_prefix + data['table'] + '"'
