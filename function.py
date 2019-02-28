@@ -148,10 +148,12 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50, open_virtual_ip=False):
+def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50,
+             open_virtual_ip=False):
     """
     This function can get a web page's source data.
 
+    :param open_virtual_ip:
     :param timeout:
     :param proxy_ip:
     :param header:
@@ -217,12 +219,9 @@ def getCookie(url, value=False, referer=False, cookie=False, header=dict(), prox
         :return: str(web page's source data)
         """
     headers = dict()
-    ip = virtualIp()
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
-    # headers['CLIENT-IP'] = ip
-    # headers['X-FORWARDED-FOR'] = ip
     if isinstance(cookie, str):
         headers['Cookie'] = cookie
     if isinstance(referer, str):
@@ -238,15 +237,15 @@ def getCookie(url, value=False, referer=False, cookie=False, header=dict(), prox
         proxy_ip_dict = dict()
     s = requests.session()
     if isinstance(value, dict):
-        res = s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
     else:
-        res = s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
     try:
         c = s.cookies.RequestsCookieJar()
         c.set('cookie-name', 'cookie-value')
         s.cookies.update(c)
     except:
-        data = ""
+        pass
     return s.cookies.get_dict()
 
 
@@ -351,9 +350,9 @@ def getDateTime(time_stamp, date_format):
     return time.strftime(date_format, time_arr)
 
 
-def getUserAgent(type=1, index=False):
+def getUserAgent(type_get=1, index=False):
     """
-    :param type: type 1 will return a random UserAgent in list
+    :param type_get: type 1 will return a random UserAgent in list
     type 2 will return a UserAgent which you choose, so you should input a index
     :param index: UserAgent's index
     :return:
@@ -378,9 +377,9 @@ def getUserAgent(type=1, index=False):
         "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.3; .NET4.0C; .NET4.0E) QQBrowser/6.9.11079.201",
         "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)"
     )
-    if type == 1:
+    if type_get == 1:
         if not isinstance(index, int):
             index = int((random.random()) * 1000) % len(agentArr)
         return agentArr[index]
-    elif type == 2:
+    elif type_get == 2:
         return len(agentArr)
