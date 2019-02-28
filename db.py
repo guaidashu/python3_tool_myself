@@ -16,11 +16,6 @@ class DBConfig(object):
     table_prefix = config['table_prefix']
     is_connection = False
     is_debug = True
-    # username = "yy"
-    # password = "wyysdsa!"
-    # host = "127.0.0.1"
-    # port = "3306"
-    # database = "hedui"
     db = None
     cursor = None
 
