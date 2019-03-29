@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 from phoenixdb import connect
-from tool.function import debug
+from .function import debug
 import pymysql
 from .config import phoenix_db_config as dbconfig
 from .config import dbconfig as pymysql_config_origin
