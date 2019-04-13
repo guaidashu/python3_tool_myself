@@ -5,9 +5,11 @@ import requests
 import random
 import time
 
-
 # change the dict to a json str
 # noinspection PyShadowingBuiltins
+from .config import settings
+
+
 def js_arr(text=None, id=None, reply=None):
     """
     This function is a tool which change the dict to a json str
@@ -120,7 +122,7 @@ def formatData(data):
     return "<pre>" + changeToStr(data, rowstr="<br/>") + "</pre>"
 
 
-def debug(data="", is_set_time=False):
+def debug(data="", is_set_time=settings.DEBUG_TIME):
     """
     :param is_set_time:
     :param data:
@@ -164,11 +166,11 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
     :return: str(web page's source data)
     """
     headers = dict()
-    ip = virtualIp()
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
     if open_virtual_ip:
+        ip = virtualIp()
         headers['CLIENT-IP'] = ip
         headers['X-FORWARDED-FOR'] = ip
     if isinstance(cookie, str):
@@ -206,10 +208,13 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
 
 
 # noinspection PyBroadException
-def getCookie(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50):
+def getCookie(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50,
+              open_virtual_ip=False):
     """
         This function can get a web page's source data.
 
+        :param timeout:
+        :param open_virtual_ip:
         :param proxy_ip:
         :param header:
         :param url: str
@@ -222,6 +227,10 @@ def getCookie(url, value=False, referer=False, cookie=False, header=dict(), prox
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
     headers['Connection'] = "keep-alive"
+    if open_virtual_ip:
+        ip = virtualIp()
+        headers['CLIENT-IP'] = ip
+        headers['X-FORWARDED-FOR'] = ip
     if isinstance(cookie, str):
         headers['Cookie'] = cookie
     if isinstance(referer, str):

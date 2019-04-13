@@ -99,7 +99,10 @@ class DBConfig(object):
                 results_final.append(content)
         else:
             results_final = dict()
-            length = len(results)
+            try:
+                length = len(results)
+            except:
+                length = 0
             for k in range(length):
                 results_final[columns_data[k][0]] = results[k]
         return results_final
@@ -148,9 +151,9 @@ class DBConfig(object):
             self.closeDB()
         return results
 
-    def update(self, sql, is_close_db=True):
+    def update(self, data, is_close_db=True):
         self.cursor = self.getCursor()
-        sql = self.getUpdateSql(sql)
+        sql = self.getUpdateSql(data)
         try:
             self.cursor.execute(sql)
             self.db.commit()
@@ -242,7 +245,7 @@ class DBConfig(object):
             self.closeDB()
         return sql
 
-    def getInsertSql(self, data, table, is_close_db=False):
+    def getInsertSql(self, data, table, is_close_db=False, table_columns=False, table_auto_increment=False):
         # 构造插入查询语句，此函数传入参数data必须为dict()类型
         s = "insert into " + self.table_prefix + table + "("
         columns = ""
@@ -254,9 +257,11 @@ class DBConfig(object):
             "condition": ['TABLE_NAME = "' + self.table_prefix + table + '"', "and",
                           'TABLE_SCHEMA = "' + self.database + '"']
         }
-        table_columns = self.getColumns(table_sql)
+        if not table_columns:
+            table_columns = self.getColumns(table_sql)
         table_sql['condition'].append("and EXTRA like '%auto_increment%'")
-        table_auto_increment = self.getColumns(table_sql)
+        if not table_auto_increment:
+            table_auto_increment = self.getColumns(table_sql)
         table_columns_dict = dict()
         str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext", "datetime": "datetime",
                     "char": "char"}
