@@ -211,7 +211,7 @@ def curlData(url, value=False, referer=False, cookie=False, header=dict(), proxy
 def getCookie(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50,
               open_virtual_ip=False):
     """
-        This function can get a web page's source data.
+        This function can get a web page's cookie.
 
         :param timeout:
         :param open_virtual_ip:
@@ -246,9 +246,9 @@ def getCookie(url, value=False, referer=False, cookie=False, header=dict(), prox
         proxy_ip_dict = dict()
     s = requests.session()
     if isinstance(value, dict):
-        s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     else:
-        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.get(url, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     try:
         c = s.cookies.RequestsCookieJar()
         c.set('cookie-name', 'cookie-value')
@@ -391,4 +391,4 @@ def getUserAgent(type_get=1, index=False):
             index = int((random.random()) * 1000) % len(agentArr)
         return agentArr[index]
     elif type_get == 2:
-        return len(agentArr)
+        return agentArr[index]
