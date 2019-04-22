@@ -391,4 +391,4 @@ def getUserAgent(type_get=1, index=False):
             index = int((random.random()) * 1000) % len(agentArr)
         return agentArr[index]
     elif type_get == 2:
-        return agentArr[index]
+        return len(agentArr)

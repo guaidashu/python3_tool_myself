@@ -1,11 +1,11 @@
 
 def dbconfig():
     config = {
-        "username": "",
-        "password": "",
+        "username": "yy",
+        "password": "wyysdsa!",
         "host": "127.0.0.1",
         "port": "3306",
-        "database": "ms",
-        "table_prefix": "ms_",
+        "database": "mv",
+        "table_prefix": "mv_",
     }
     return config
