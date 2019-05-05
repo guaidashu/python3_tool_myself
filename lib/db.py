@@ -165,6 +165,36 @@ class DBConfig(object):
             self.closeDB()
         return results
 
+    def delete(self, data, is_close_db=True):
+        self.cursor = self.getCursor()
+        sql = self.getDeleteSql(data)
+        debug(sql)
+        try:
+            self.cursor.execute(sql)
+            self.db.commit()
+            results = 1
+        except Exception as e:
+            debug("Database delete error")
+            results = 0
+        if is_close_db:
+            self.closeDB()
+        return results
+
+    def getDeleteSql(self, data):
+        sql = 'delete'
+        data['table'] = self.table_prefix + data['table']
+        sql = sql + " from " + data['table']
+        try:
+            data['condition']
+            sql = sql + " where "
+            s = ""
+            for i in data['condition']:
+                s = s + i + " "
+            sql = sql + s
+        except Exception as e:
+            debug("condition is err, err info: {error}".format(error=e))
+        return sql
+
     # noinspection PyUnresolvedReferences
     def getSelectSql(self, data, is_close_db=False):
         sql = "select "
