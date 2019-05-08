@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 import pymysql
-from config import dbconfig
+from ..config import dbconfig
 from .function import debug
 
 
