@@ -323,8 +323,10 @@ class DBConfig(object):
                 del table_columns_dict[k]
             i = i + 1
         # 删除主键id
-        for v in table_auto_increment:
-            del table_columns_dict[v[0]]
+        if not data['id']:
+            for v in table_auto_increment:
+                if v[0] == "id":
+                    del table_columns_dict[v[0]]
         for k, v in table_columns_dict.items():
             columns = columns + "," + str(k)
             if table_columns_dict[k] in str_dict:
