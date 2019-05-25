@@ -210,10 +210,7 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
             data = res.content.decode("GBK")
         except:
             data = res.content
-    if return_response:
-        return data, res
-    else:
-        return data
+    return data, res if return_response else data
 
 
 # noinspection PyBroadException
