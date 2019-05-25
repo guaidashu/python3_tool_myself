@@ -150,11 +150,12 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curl_data(url, value=False, referer=False, cookie=False, header=dict(), proxy_ip="", timeout=50,
-              open_virtual_ip=False, params={}):
+def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
+              open_virtual_ip=False, params=None, return_response=False):
     """
     This function can get a web page's source data.
 
+    :param return_response:
     :param params:
     :param open_virtual_ip:
     :param timeout:
@@ -166,6 +167,10 @@ def curl_data(url, value=False, referer=False, cookie=False, header=dict(), prox
     :param cookie: str
     :return: str(web page's source data)
     """
+    if params is None:
+        params = {}
+    if header is None:
+        header = dict()
     headers = dict()
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
@@ -205,11 +210,14 @@ def curl_data(url, value=False, referer=False, cookie=False, header=dict(), prox
             data = res.content.decode("GBK")
         except:
             data = res.content
-    return data
+    if return_response:
+        return data, res
+    else:
+        return data
 
 
 # noinspection PyBroadException
-def get_cookie(url, value=False, referer=False, cookie=False, header={}, proxy_ip="", timeout=50,
+def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
                open_virtual_ip=False):
     """
         This function can get a web page's source data.
@@ -224,6 +232,8 @@ def get_cookie(url, value=False, referer=False, cookie=False, header={}, proxy_i
         :param cookie: str
         :return: str(web page's source data)
         """
+    if header is None:
+        header = {}
     headers = dict()
     headers['User-Agent'] = "baiduspider"
     headers['Accept'] = "*/*"
