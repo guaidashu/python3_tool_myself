@@ -22,13 +22,13 @@ class DBConfig(object):
         self.is_connection = False
         # 初始化方法允许用户单独定义要访问的数据库
         if kwargs.setdefault("username", None):
-            self.database = kwargs["username"]
+            self.username = kwargs["username"]
         if kwargs.setdefault("password", None):
-            self.database = kwargs["password"]
+            self.password = kwargs["password"]
         if kwargs.setdefault("host", None):
-            self.database = kwargs["host"]
+            self.host = kwargs["host"]
         if kwargs.setdefault("port", None):
-            self.database = kwargs["port"]
+            self.port = kwargs["port"]
         if kwargs.setdefault("database", None):
             self.database = kwargs["database"]
         if kwargs.setdefault("table_prefix", None):
