@@ -32,7 +32,10 @@ class DBConfig(object):
         if kwargs.setdefault("database", None):
             self.database = kwargs["database"]
         if kwargs.setdefault("table_prefix", None):
-            self.table_prefix = kwargs["table_prefix"]
+            if kwargs["table_prefix"] == 1:
+                self.table_prefix = ""
+            else:
+                self.table_prefix = kwargs["table_prefix"]
 
     def __del__(self):
         self.closeDB()
