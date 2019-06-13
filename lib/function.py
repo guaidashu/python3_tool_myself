@@ -205,10 +205,10 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
             res = requests.get(url, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     try:
         data = res.content.decode("utf-8")
-    except:
+    except UnicodeDecodeError:
         try:
             data = res.content.decode("GBK")
-        except:
+        except UnicodeDecodeError:
             data = res.content
     return data, res if return_response else data
 
@@ -261,7 +261,7 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
         c = s.cookies.RequestsCookieJar()
         c.set('cookie-name', 'cookie-value')
         s.cookies.update(c)
-    except:
+    except IOError:
         pass
     return s.cookies.get_dict()
 
@@ -277,10 +277,10 @@ def get_client_ip(request):
     try:
         real_ip = request.META['HTTP_X_FORWARDED_FOR']
         regip = real_ip.split(",")[0]
-    except:
+    except Exception:
         try:
             regip = request.META['REMOTE_ADDR']
-        except:
+        except IOError:
             regip = ""
     return regip
 
@@ -308,10 +308,10 @@ def byte_to_str(data, data_type=None):
     elif isinstance(data, bytes):
         try:
             return data.decode("utf-8")
-        except:
+        except UnicodeDecodeError:
             try:
                 return data.decode("GBK")
-            except:
+            except UnicodeDecodeError:
                 return None
     elif isinstance(data, dict):
         return dict(map(byte_to_str, data.items()))

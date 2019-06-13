@@ -14,13 +14,25 @@ class DBConfig(object):
     port = config['port']
     database = config['database']
     table_prefix = config['table_prefix']
-    is_connection = False
     is_debug = True
     db = None
     cursor = None
 
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        self.is_connection = False
+        # 初始化方法允许用户单独定义要访问的数据库
+        if kwargs.setdefault("username", None):
+            self.database = kwargs["username"]
+        if kwargs.setdefault("password", None):
+            self.database = kwargs["password"]
+        if kwargs.setdefault("host", None):
+            self.database = kwargs["host"]
+        if kwargs.setdefault("port", None):
+            self.database = kwargs["port"]
+        if kwargs.setdefault("database", None):
+            self.database = kwargs["database"]
+        if kwargs.setdefault("table_prefix", None):
+            self.table_prefix = kwargs["table_prefix"]
 
     def __del__(self):
         self.closeDB()
@@ -42,7 +54,7 @@ class DBConfig(object):
     def closeDB(self):
         try:
             self.db.close()
-        except:
+        except IOError:
             pass
             # debug("数据库关闭失败")
 
@@ -61,14 +73,14 @@ class DBConfig(object):
                                       'TABLE_SCHEMA = "' + self.database + '"']
                     }
                     columns_data = self.getColumns(columns_sql)
-                except:
+                except IOError:
                     return {"error": "字段信息获取失败"}
             else:
                 columns_data = tuple()
                 for v in data['columns']:
                     tmp_tuple = ((v,),)
                     columns_data = columns_data + tmp_tuple
-        except:
+        except IOError:
             try:
                 columns_sql = {
                     "table": "information_schema.columns",
@@ -77,7 +89,7 @@ class DBConfig(object):
                                   'TABLE_SCHEMA = "' + self.database + '"']
                 }
                 columns_data = self.getColumns(columns_sql)
-            except:
+            except IOError:
                 return {"error": "字段信息获取失败"}
         try:
             self.cursor.execute(sql)
@@ -85,7 +97,7 @@ class DBConfig(object):
                 results = self.cursor.fetchall()
             else:
                 results = self.cursor.fetchone()
-        except:
+        except IOError:
             results = {"error": "数据获取失败"}
         if is_close_db:
             self.closeDB()
@@ -101,7 +113,7 @@ class DBConfig(object):
             results_final = dict()
             try:
                 length = len(results)
-            except:
+            except Exception:
                 length = 0
             for k in range(length):
                 results_final[columns_data[k][0]] = results[k]
@@ -116,7 +128,7 @@ class DBConfig(object):
                 results = self.cursor.fetchall()
             else:
                 results = self.cursor.fetchone()
-        except:
+        except IOError:
             results = 0
             debug("It's error that get table columns")
         if is_close_db:
@@ -158,7 +170,7 @@ class DBConfig(object):
             self.cursor.execute(sql)
             self.db.commit()
             results = 1
-        except:
+        except IOError:
             debug("Database update error")
             results = 0
         if is_close_db:
@@ -173,7 +185,7 @@ class DBConfig(object):
             self.cursor.execute(sql)
             self.db.commit()
             results = 1
-        except Exception as e:
+        except Exception:
             debug("Database delete error")
             results = 0
         if is_close_db:
@@ -206,7 +218,7 @@ class DBConfig(object):
                     s = s + i + ","
                 else:
                     s = s + i
-        except:
+        except Exception:
             s = "*"
         sql = sql + s + " from " + data['table']
         # if there is a condition , we spell it
@@ -217,19 +229,19 @@ class DBConfig(object):
             for i in data['condition']:
                 s = s + i + " "
             sql = sql + s
-        except:
+        except Exception:
             pass
         # if there is a order need , we spell it
         try:
             data['order']
             sql = sql + " order by " + data['order'][0] + " " + data['order'][1]
-        except:
+        except Exception:
             pass
         # if there is limit. we spell it
         try:
             data['limit']
             sql = sql + " limit " + str(data['limit'][0]) + "," + str(data['limit'][1])
-        except:
+        except Exception:
             pass
         if is_close_db:
             self.closeDB()
@@ -269,7 +281,7 @@ class DBConfig(object):
             for i in data['condition']:
                 s = s + i + " "
             sql = sql + s
-        except:
+        except Exception:
             pass
         if is_close_db:
             self.closeDB()
@@ -299,7 +311,7 @@ class DBConfig(object):
         try:
             for v in table_columns:
                 table_columns_dict[v[0]] = v[1]
-        except:
+        except Exception:
             pass
         length = len(data)
         i = 1
@@ -307,16 +319,16 @@ class DBConfig(object):
             if i != length:
                 columns = columns + k + ","
                 # if table_columns_dict[k] in str_dict:
-                tmpstr = "%s," % self.db.escape(str(v))
-                value = value + tmpstr
+                tmp_str = "%s," % self.db.escape(str(v))
+                value = value + tmp_str
                 # else:
-                # tmpstr = "%s," % self.db.escape()
-                # value = value + tmpstr
+                # tmp_str = "%s," % self.db.escape()
+                # value = value + tmp_str
             else:
                 columns = columns + k
                 # if table_columns_dict[k] in str_dict:
-                tmpstr = "%s" % self.db.escape(str(v))
-                value = value + tmpstr
+                tmp_str = "%s" % self.db.escape(str(v))
+                value = value + tmp_str
                 # else:
                 #     value = value + str(v)
             if k in table_columns_dict:
