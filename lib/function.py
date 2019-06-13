@@ -261,7 +261,7 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
         c = s.cookies.RequestsCookieJar()
         c.set('cookie-name', 'cookie-value')
         s.cookies.update(c)
-    except IOError:
+    except:
         pass
     return s.cookies.get_dict()
 
@@ -280,7 +280,7 @@ def get_client_ip(request):
     except Exception:
         try:
             regip = request.META['REMOTE_ADDR']
-        except IOError:
+        except:
             regip = ""
     return regip
 
