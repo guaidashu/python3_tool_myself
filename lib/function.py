@@ -108,7 +108,7 @@ def change_to_str(data, rowstr="<br>", count=4, origin_count=4):
         for v in data:
             s = s + space1 + "[" + str(i) + "] => " + change_to_str(v, rowstr, count, origin_count)
             i = i + 1
-        s = s + space2 + endstr
+        s = s + endstr if not length else s + space2 + endstr
     else:
         s = str(data)
     return s
