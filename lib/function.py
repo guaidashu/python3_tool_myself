@@ -89,13 +89,13 @@ def change_to_str(data, rowstr="<br>", count=4, origin_count=4):
     count = count + origin_count
     if isinstance(data, dict):
         length = len(data)
-        s = s + "dict(" + str(length) + ") =>{"
+        s = s + "dict(" + str(length) + ") => {"
         for k, v in data.items():
             s = s + space1 + "['" + str(k) + "'] => " + change_to_str(v, rowstr, count, origin_count)
         s = s + space2 + endstr
     elif isinstance(data, (tuple)):
         length = len(data)
-        s = s + "tuple(" + str(length) + ") =>{"
+        s = s + "tuple(" + str(length) + ") => {"
         i = 0
         for v in data:
             s = s + space1 + "[" + str(i) + "] => " + change_to_str(v, rowstr, count, origin_count)
@@ -103,7 +103,7 @@ def change_to_str(data, rowstr="<br>", count=4, origin_count=4):
         s = s + space2 + endstr
     elif isinstance(data, (list)):
         length = len(data)
-        s = s + "list(" + str(length) + ") =>{"
+        s = s + "list(" + str(length) + ") => {"
         i = 0
         for v in data:
             s = s + space1 + "[" + str(i) + "] => " + change_to_str(v, rowstr, count, origin_count)
