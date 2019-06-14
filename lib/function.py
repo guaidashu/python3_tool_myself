@@ -103,12 +103,12 @@ def change_to_str(data, rowstr="<br>", count=4, origin_count=4):
         s = s + space2 + endstr
     elif isinstance(data, (list)):
         length = len(data)
-        s = s + "list(" + str(length) + ") => {"
+        s = s + "list(" + str(length) + ") => ["
         i = 0
         for v in data:
             s = s + space1 + "[" + str(i) + "] => " + change_to_str(v, rowstr, count, origin_count)
             i = i + 1
-        s = s + endstr if not length else s + space2 + endstr
+        s = s + "]" if not length else s + space2 + "]"
     else:
         s = str(data)
     return s
