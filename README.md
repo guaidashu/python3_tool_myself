@@ -16,9 +16,15 @@
 
     Example
 
-  	    from tool_yy import helper
+  	    from tool_yy import Helper
+  	    
+  	    def create_helper():
+  	        helper = Helper()
+            helper.config.from_object('setting')
+            return helper
   	    
   	    if __name__ == "__main__":
+  	        helper = create_helper()
             db = helper.init_db("INSOMNIA_MUSIC_DATABASE_CONFIG")
 
 
