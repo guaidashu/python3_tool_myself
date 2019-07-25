@@ -2,3 +2,9 @@
 .idea
 test
 main.py
+.vscode
+Pipfile
+Pipfile.lock
+build
+dist
+setting.py

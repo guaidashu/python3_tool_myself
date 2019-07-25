@@ -3,8 +3,7 @@
 from phoenixdb import connect
 from .function import debug
 import pymysql
-from ..config import phoenix_db_config as dbconfig
-from ..config import dbconfig as pymysql_config_origin
+from tool_yy.config import dbconfig as pymysql_config_origin, phoenix_db_config as dbconfig
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic,PyBroadException,PyStatementEffect

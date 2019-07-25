@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 import pymysql
-from ..config import dbconfig
+from tool_yy.config import dbconfig
 from .function import debug
 
 
@@ -60,6 +60,12 @@ class DBConfig(object):
         except:
             pass
             # debug("数据库关闭失败")
+
+    def close(self):
+        try:
+            self.db.close()
+        except:
+            pass
 
     def select(self, data, get_all=True, is_close_db=True):
         self.cursor = self.getCursor()

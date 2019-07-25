@@ -7,7 +7,7 @@ import time
 
 # change the dict to a json str
 # noinspection PyShadowingBuiltins
-from ..config import settings
+from tool_yy.config import settings
 
 
 def js_arr(text=None, id=None, reply=None):
