@@ -209,7 +209,7 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
             data = res.content.decode("GBK")
         except UnicodeDecodeError:
             data = res.content
-    return data, res if return_response else data
+    return (data, res) if return_response else data
 
 
 # noinspection PyBroadException
