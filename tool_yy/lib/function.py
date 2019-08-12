@@ -197,6 +197,12 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
                                 timeout=timeout)
         else:
             res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
+    elif isinstance(params, dict):
+        if isinstance(cookie, dict):
+            res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
+                               timeout=timeout)
+        else:
+            res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
     else:
         if isinstance(cookie, dict):
             res = requests.get(url, headers=headers, proxies=proxy_ip_dict, cookies=cookie, timeout=timeout)
@@ -214,10 +220,11 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
 
 # noinspection PyBroadException
 def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
-               open_virtual_ip=False):
+               open_virtual_ip=False, params=None):
     """
         This function can get a web page's source data.
 
+        :param params:
         :param timeout:
         :param open_virtual_ip:
         :param proxy_ip:
@@ -254,6 +261,8 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
     s = requests.session()
     if isinstance(value, dict):
         s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+    elif isinstance(params, dict):
+        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout, params=params)
     else:
         s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
     try:
