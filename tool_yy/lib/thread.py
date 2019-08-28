@@ -18,14 +18,14 @@ class Thread(object):
         :param kwargs:
         :return:
         """
-        thread_pool = ThreadPoolExecutor(max_workers=max_worker)
-        task_list = list()
         result = list()
-        for item in data:
-            task = thread_pool.submit(fun, item, **kwargs)
-            task_list.append(task)
-            if is_test:
-                break
-        for i in as_completed(task_list):
-            result.append(i.result())
+        with ThreadPoolExecutor(max_workers=max_worker) as thread_pool:
+            task_list = list()
+            for item in data:
+                task = thread_pool.submit(fun, item, **kwargs)
+                task_list.append(task)
+                if is_test:
+                    break
+            for i in as_completed(task_list):
+                result.append(i.result())
         return result
