@@ -21,21 +21,12 @@ class DBConfig(object):
     def __init__(self, **kwargs):
         self.is_connection = False
         # 初始化方法允许用户单独定义要访问的数据库
-        if kwargs.setdefault("username", None):
-            self.username = kwargs["username"]
-        if kwargs.setdefault("password", None):
-            self.password = kwargs["password"]
-        if kwargs.setdefault("host", None):
-            self.host = kwargs["host"]
-        if kwargs.setdefault("port", None):
-            self.port = kwargs["port"]
-        if kwargs.setdefault("database", None):
-            self.database = kwargs["database"]
-        if kwargs.setdefault("table_prefix", None):
-            if kwargs["table_prefix"] == 1:
-                self.table_prefix = ""
-            else:
-                self.table_prefix = kwargs["table_prefix"]
+        self.username = kwargs.setdefault("username", "root")
+        self.password = kwargs.setdefault("password", "root")
+        self.host = kwargs.setdefault("host", "127.0.0.1")
+        self.port = kwargs.setdefault("port", "3306")
+        self.database = kwargs.setdefault("database", "mysql")
+        self.table_prefix = kwargs.setdefault("table_prefix", "")
 
     def __del__(self):
         self.closeDB()
@@ -189,7 +180,6 @@ class DBConfig(object):
     def delete(self, data, is_close_db=True):
         self.cursor = self.getCursor()
         sql = self.getDeleteSql(data)
-        debug(sql)
         try:
             self.cursor.execute(sql)
             self.db.commit()
@@ -361,6 +351,23 @@ class DBConfig(object):
         data = s + columns + ")values(" + value + ")"
         if is_close_db:
             self.closeDB()
+        return data
+
+    def free(self, sql, is_close_db=True):
+        self.cursor = self.getCursor()
+        data = 1
+        try:
+            self.cursor.execute(sql)
+            if sql.lower().find("select ") != -1:
+                data = self.cursor.fetchall()
+        except Exception as e:
+            if self.is_debug:
+                debug("原生语句执行出错，报错信息：")
+                data = 0
+                debug(e)
+        finally:
+            if is_close_db:
+                self.closeDB()
         return data
 
 
