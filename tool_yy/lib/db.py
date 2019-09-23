@@ -142,6 +142,7 @@ class DBConfig(object):
             self.db.commit()
             results = 1
         except Exception as e:
+            self.db.rollback()
             debug(e)
             debug("Database insert error")
             results = 0
@@ -156,6 +157,7 @@ class DBConfig(object):
             self.db.commit()
             results = self.cursor.lastrowid
         except Exception as e:
+            self.db.rollback()
             debug(e)
             debug("Database insert error")
             results = 0
@@ -171,6 +173,7 @@ class DBConfig(object):
             self.db.commit()
             results = 1
         except:
+            self.db.rollback()
             debug("Database update error")
             results = 0
         if is_close_db:
@@ -185,6 +188,7 @@ class DBConfig(object):
             self.db.commit()
             results = 1
         except:
+            self.db.rollback()
             debug("Database delete error")
             results = 0
         if is_close_db:
@@ -361,6 +365,7 @@ class DBConfig(object):
             if sql.lower().find("select ") != -1:
                 data = self.cursor.fetchall()
         except Exception as e:
+            self.db.rollback()
             if self.is_debug:
                 debug("原生语句执行出错，报错信息：")
                 data = 0

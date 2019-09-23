@@ -1,4 +1,4 @@
-# **Too-yy, designed by yy**
+# **Tool-yy, designed by yy**
 
 ## Installing and Getting started
 
