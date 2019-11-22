@@ -150,10 +150,12 @@ def replace_html(s):
 
 # noinspection PyBroadException
 def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
-              open_virtual_ip=False, params=None, return_response=False):
+              open_virtual_ip=False, params=None, return_response=False, allow_redirects=True):
     """
     This function can get a web page's source data.
 
+    :param allow_redirects: (optional) Boolean. Enable/disable GET/OPTIONS/POST/PUT/PATCH/DELETE/HEAD redirection.
+    Defaults to ``True``.
     :param return_response:
     :param params:
     :param open_virtual_ip:
@@ -194,20 +196,24 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
     if isinstance(value, dict):
         if isinstance(cookie, dict):
             res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
-                                timeout=timeout)
+                                timeout=timeout, allow_redirects=allow_redirects)
         else:
-            res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
+            res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout,
+                                allow_redirects=allow_redirects)
     elif isinstance(params, dict):
         if isinstance(cookie, dict):
             res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
-                               timeout=timeout)
+                               timeout=timeout, allow_redirects=allow_redirects)
         else:
-            res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
+            res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout,
+                               allow_redirects=allow_redirects)
     else:
         if isinstance(cookie, dict):
-            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, cookies=cookie, timeout=timeout)
+            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, cookies=cookie, timeout=timeout,
+                               allow_redirects=allow_redirects)
         else:
-            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, timeout=timeout)
+            res = requests.get(url, headers=headers, proxies=proxy_ip_dict, timeout=timeout,
+                               allow_redirects=allow_redirects)
     try:
         data = res.content.decode("utf-8")
     except UnicodeDecodeError:
@@ -220,10 +226,12 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
 
 # noinspection PyBroadException
 def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
-               open_virtual_ip=False, params=None):
+               open_virtual_ip=False, params=None, allow_redirects=True):
     """
         This function can get a web page's source data.
 
+        :param allow_redirects: (optional) Boolean. Enable/disable GET/OPTIONS/POST/PUT/PATCH/DELETE/HEAD redirection.
+        Defaults to ``True``.
         :param params:
         :param timeout:
         :param open_virtual_ip:
@@ -260,11 +268,14 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
         proxy_ip_dict = dict()
     s = requests.session()
     if isinstance(value, dict):
-        s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout,
+               allow_redirects=allow_redirects)
     elif isinstance(params, dict):
-        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout, params=params)
+        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout, params=params,
+              allow_redirects=allow_redirects)
     else:
-        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout)
+        s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout,
+              allow_redirects=allow_redirects)
     try:
         c = s.cookies.RequestsCookieJar()
         c.set('cookie-name', 'cookie-value')
