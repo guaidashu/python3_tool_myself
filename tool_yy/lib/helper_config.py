@@ -24,8 +24,10 @@ class HelperConfig(HelperContext):
         self._db = DBConfig()
 
     def __del__(self):
-        with self.auto_handle_exception():
+        try:
             self._db.close()
+        except:
+            pass
 
     @property
     def db(self):
