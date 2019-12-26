@@ -14,7 +14,7 @@ class HelperConfig(HelperContext):
         "MYSQL_PASSWORD": "root",
         "MYSQL_HOST": "127.0.0.1",
         "MYSQL_PORT": "3306",
-        "MYSQL_TABLE_PREFIX": 1
+        "MYSQL_TABLE_PREFIX": ""
     }
 
     def __init__(self, **kwargs):
