@@ -310,6 +310,9 @@ class DBConfig(object):
         table_columns_dict = dict()
         str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext", "datetime": "datetime",
                     "char": "char"}
+        ignore_dict = {
+            "timestamp": "timestamp"
+        }
         # int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float"}
         try:
             for v in table_columns:
@@ -347,11 +350,13 @@ class DBConfig(object):
                 pass
             del table_columns_dict[v[0]]
         for k, v in table_columns_dict.items():
-            columns = columns + "," + str(k)
             if table_columns_dict[k] in str_dict:
                 value = value + ",'" + str("") + "'"
+            elif table_columns_dict[k] in ignore_dict:
+                continue
             else:
                 value = value + "," + "0"
+            columns = columns + "," + str(k)
         data = s + columns + ")values(" + value + ")"
         if is_close_db:
             self.closeDB()
