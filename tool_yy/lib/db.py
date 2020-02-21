@@ -290,7 +290,8 @@ class DBConfig(object):
             self.closeDB()
         return sql
 
-    def getInsertSql(self, data, table, is_close_db=False, table_columns=False, table_auto_increment=False):
+    def getInsertSql(self, data, table, is_close_db=False, table_columns=False, table_auto_increment=False,
+                     ignore_column_type=None):
         # 构造插入查询语句，此函数传入参数data必须为dict()类型
         s = "insert into " + self.table_prefix + table + "("
         columns = ""
@@ -308,11 +309,16 @@ class DBConfig(object):
         if not table_auto_increment:
             table_auto_increment = self.getColumns(table_sql)
         table_columns_dict = dict()
-        str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext", "datetime": "datetime",
+        str_dict = {"text": "text", "varchar": "varchar", "longtext": "longtext",
                     "char": "char"}
         ignore_dict = {
-            "timestamp": "timestamp"
+            "timestamp": "timestamp",
+            "datetime": "datetime",
         }
+        # merge two ignore_dict
+        if ignore_column_type:
+            ignore_dict = ignore_dict.copy()
+            ignore_dict.update(ignore_column_type)
         # int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float"}
         try:
             for v in table_columns:
