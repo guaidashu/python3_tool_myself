@@ -94,7 +94,7 @@ def change_to_str(data, rowstr="<br>", count=4, origin_count=4):
         s = s + endstr if not length else s + space2 + endstr
     elif isinstance(data, (tuple)):
         length = len(data)
-        s = s + "tuple(" + str(length) + ") => {"
+        s = s + "tuple(" + str(length) + ") => ("
         i = 0
         for v in data:
             s = s + space1 + "[" + str(i) + "] => " + change_to_str(v, rowstr, count, origin_count)
