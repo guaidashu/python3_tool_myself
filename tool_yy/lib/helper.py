@@ -5,7 +5,7 @@ from .helper_config import HelperConfig
 
 
 class Helper(HelperConfig):
-    __slots__ = ("psql", "phoniex", "db")
+    __slots__ = ("psql", "phoniex", "db", "redis")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
