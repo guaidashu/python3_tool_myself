@@ -193,7 +193,7 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
         }
     else:
         proxy_ip_dict = dict()
-    if isinstance(value, dict):
+    if value:
         if isinstance(cookie, dict):
             res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
                                 timeout=timeout, allow_redirects=allow_redirects)
@@ -267,7 +267,7 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
     else:
         proxy_ip_dict = dict()
     s = requests.session()
-    if isinstance(value, dict):
+    if value:
         s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout,
                allow_redirects=allow_redirects)
     elif isinstance(params, dict):
