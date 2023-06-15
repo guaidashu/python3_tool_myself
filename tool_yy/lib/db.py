@@ -63,35 +63,6 @@ class DBConfig(object):
         data['table'] = self.table_prefix + data['table']
         sql = self.getSelectSql(data)
         try:
-            data['columns'][0]
-            if data['columns'][0] == "*":
-                try:
-                    columns_sql = {
-                        "table": "information_schema.columns",
-                        "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                        "condition": ['TABLE_NAME = "' + data['table'] + '"', "and",
-                                      'TABLE_SCHEMA = "' + self.database + '"']
-                    }
-                    columns_data = self.getColumns(columns_sql)
-                except:
-                    return {"error": "字段信息获取失败"}
-            else:
-                columns_data = tuple()
-                for v in data['columns']:
-                    tmp_tuple = ((v,),)
-                    columns_data = columns_data + tmp_tuple
-        except:
-            try:
-                columns_sql = {
-                    "table": "information_schema.columns",
-                    "columns": ["COLUMN_NAME", "DATA_TYPE"],
-                    "condition": ['TABLE_NAME = "' + data['table'] + '"', "and",
-                                  'TABLE_SCHEMA = "' + self.database + '"']
-                }
-                columns_data = self.getColumns(columns_sql)
-            except:
-                return {"error": "字段信息获取失败"}
-        try:
             self.cursor.execute(sql)
             if get_all:
                 results = self.cursor.fetchall()
@@ -101,23 +72,8 @@ class DBConfig(object):
             results = {"error": "数据获取失败"}
         if is_close_db:
             self.closeDB()
-        if get_all:
-            results_final = list()
-            for v in results:
-                length = len(v)
-                content = dict()
-                for k in range(length):
-                    content[columns_data[k][0]] = v[k]
-                results_final.append(content)
-        else:
-            results_final = dict()
-            try:
-                length = len(results)
-            except:
-                length = 0
-            for k in range(length):
-                results_final[columns_data[k][0]] = results[k]
-        return results_final
+
+        return results
 
     def getColumns(self, data, num=1, is_close_db=False):
         self.cursor = self.getCursor()
@@ -322,7 +278,7 @@ class DBConfig(object):
         # int_dict = {"int": "int", "bigint": "bigint", "decimal": "decimal", "double": "double", "float": "float"}
         try:
             for v in table_columns:
-                table_columns_dict[v[0]] = v[1]
+                table_columns_dict[v['COLUMN_NAME']] = v['DATA_TYPE']
         except:
             pass
         length = len(data)
@@ -350,11 +306,11 @@ class DBConfig(object):
         for v in table_auto_increment:
             try:
                 data['id']
-                if v[0] == "id":
+                if v['COLUMN_NAME'] == "id":
                     continue
             except Exception as e:
                 pass
-            del table_columns_dict[v[0]]
+            del table_columns_dict[v['COLUMN_NAME']]
         for k, v in table_columns_dict.items():
             if table_columns_dict[k] in str_dict:
                 value = value + ",'" + str("") + "'"
