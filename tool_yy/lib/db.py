@@ -32,8 +32,8 @@ class DBConfig(object):
         self.closeDB()
 
     def getConnect(self):
-        return pymysql.connect(self.host, self.username, self.password, self.database, charset="utf8",
-                               cursorclass=pymysql.cursors.DictCursor)
+        return pymysql.connect(host=self.host, user=self.username, password=self.password, database=self.database,
+                               charset="utf8", cursorclass=pymysql.cursors.DictCursor)
 
     def getCursor(self):
         try:
