@@ -149,7 +149,7 @@ def replace_html(s):
 
 
 # noinspection PyBroadException
-def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
+def curl_data(url, value=False, json_val=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
               open_virtual_ip=False, params=None, return_response=False, allow_redirects=True):
     """
     This function can get a web page's source data.
@@ -164,6 +164,7 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
     :param header:
     :param url: str
     :param value: dict or default(None)
+    :param json_val: dict or default(None)
     :param referer: str
     :param cookie: str
     :return: str(web page's source data)
@@ -200,6 +201,13 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
         else:
             res = requests.post(url, data=value, headers=headers, proxies=proxy_ip_dict, timeout=timeout,
                                 allow_redirects=allow_redirects)
+    elif json_val:
+        if isinstance(cookie, dict):
+            res = requests.post(url, json=json_val, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
+                                timeout=timeout, allow_redirects=allow_redirects)
+        else:
+            res = requests.post(url, json=json_val, headers=headers, proxies=proxy_ip_dict, timeout=timeout,
+                                allow_redirects=allow_redirects)
     elif isinstance(params, dict):
         if isinstance(cookie, dict):
             res = requests.get(url, params=value, headers=headers, proxies=proxy_ip_dict, cookies=cookie,
@@ -225,7 +233,7 @@ def curl_data(url, value=False, referer=False, cookie=False, header=None, proxy_
 
 
 # noinspection PyBroadException
-def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
+def get_cookie(url, value=False, json_val=False, referer=False, cookie=False, header=None, proxy_ip="", timeout=50,
                open_virtual_ip=False, params=None, allow_redirects=True):
     """
         This function can get a web page's source data.
@@ -239,6 +247,7 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
         :param header:
         :param url: str
         :param value: dict or default(None)
+        :param json_val: dict or default(None)
         :param referer: str
         :param cookie: str
         :return: str(web page's source data)
@@ -269,6 +278,9 @@ def get_cookie(url, value=False, referer=False, cookie=False, header=None, proxy
     s = requests.session()
     if value:
         s.post(url, data=value, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout,
+               allow_redirects=allow_redirects)
+    elif json_val:
+        s.post(url, json=json_val, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout,
                allow_redirects=allow_redirects)
     elif isinstance(params, dict):
         s.get(url, headers=headers, proxies=proxy_ip_dict, verify=False, timeout=timeout, params=params,
